@@ -1,5 +1,5 @@
 ---
-title: "CYO London Housing"
+title: "HarvardX - CYO London Housing Prices"
 author: "Toby Wong"
 date: "Jun 2021"
 output: pdf_document
@@ -18,7 +18,7 @@ This report is part of "Create Your Own" project for the capstone course of Harv
 
 The objective of this project is to compare the performance of selected machine learning algorithms for housing price prediction and determine whether the inclusion of demographic data (population, unemployment rate and crime rate) can improve the accuracy of the housing price prediction.
 
-Residual mean squared error (RMSE) score is used as the performance indicator for different algorithms and it is computed by using the formula below:
+Residual mean squared error (RMSE) score is used as the performance indicator for the different algorithms and it is computed by using the formula below:
 
 $$RMSE=\sqrt{\frac{1}{N}\sum_{}(y_{t}-\hat{y}_{p})^2}$$
 
@@ -40,6 +40,8 @@ This report is divided into the following sections:
 4 Model Analysis
 5 Results
 6 Conclusion
+7 Reference
+
 
 # 2 London Housing Prices Data Set
 
@@ -47,13 +49,13 @@ This project uses the housing prices data in London for the algorithms and the d
 
 After downloaded the data, the following process is performed to prepare the data-set for the machine learning models: 
 
-1. Verify and add the borough data using PostcodesioR package
-2. Combine housing data with demographic data
-3. Calculate price per square foot (ppsf), unemployment rate and crime rate
-4. Simplify the types of property
-5. Change the data to appropriate classes
-6. Tidy up the data-set and remove un-needed data
-7. Name the resulted data-set as "london"
++ Verify and add the borough data using PostcodesioR package
++ Calculate price per square foot (ppsf), unemployment rate and crime rate
++ Combine housing data with demographic data
++ Simplify property types
++ Change the data to appropriate classes
++ Tidy up the data-set and remove un-needed data
++ Name the data-set "london"
 
 ```{r London Housing Prices Data, results = FALSE}
 # Load Packages
@@ -164,7 +166,7 @@ rm(temp_data, temp_info, x, london_e_c, london_crime, london_unemployment)
 
 # 3 Data Exploration
                         
-Before building the machine learning models, data exploration is carried out on "london" data-set to understand the data structure and the variables it contained.  This process helps to determine how to build the models for the analysis.
+Before building the machine learning models, data exploration is carried out on "london" data-set to understand the data structure and the variables it contained.  This process helps to determine how the models is built for the analysis.
 
 ```{r Summary of london}
 
@@ -175,7 +177,7 @@ summary(london)
 From the summary above, it is noted that "london" data-set a `r class(london)` and it contains `r ncol(london)` columns/variables and `r nrow(london)` rows/observations.  The columns in "london" are:
 
 + "ppsf" - price per square foot
-+ "type" - property type (apartment, house, penthouse)
++ "type" - property type ("apartment", "house" and "penthouse")
 + "area" - size of the property
 + "bedroom" - number of bedroom
 + "bathroom" - number of bathroom
@@ -193,7 +195,7 @@ head(london)
 
 The first 6 rows shown that all variables are in numeric class except "type" and "borough", which are in factor class.
 
-The most important variable in the data-set is price per square foot (ppsf) and it is the prediction of the algorithms used in this project.  By using ppsf, the prediction takes away the factor of the size of the property to provide a more accurate reflection of the property price.
+The most important variable in the data-set is price per square foot (ppsf) and the algorithms in the project are constructed to predict ppsf.  By using ppsf, the prediction takes away the factor of the size of the property to provide a more accurate reflection of the property price.
 
 
 ```{r Price range boxplot}
@@ -203,7 +205,7 @@ boxplot(london$ppsf, horizontal = TRUE, xlab = "Price per Square Foot (Pounds)",
 
 ```
 
-The ppsf boxplot above shown a range from GBP `r min(london$ppsf)` per sq ft to GMP `r max(london$ppsf)` per sq ft and it also shown majority of the property is around GBP 1000 per sq ft.
+The ppsf boxplot above shown a range from GBP `r min(london$ppsf)` per sq ft to GBP `r max(london$ppsf)` per sq ft and it also shown majority of the property is around GBP 1000 per sq ft.
 
 ```{r Types of property}
 
@@ -214,7 +216,7 @@ london%>%group_by(type) %>%
 
 ```
 
-The properties are sorted into three different types as shown in the table above.  "Apartment" and "House" are the two predominant types while much lesser properties are "Penthouse" in the data-set. 
+The properties are sorted into three different types as shown in the table above.  "Apartment" and "House" are the two predominant types while much lesser properties are "Penthouse". 
 
 ```{r Size of Properties}
 
@@ -232,7 +234,7 @@ boxplot(london$bedroom, horizontal = TRUE, main = "BEDROOM NUMBER", xlab = "No o
 
 ```
 
-The bedroom boxplot demonstrated that most of the properties has two to four bedrooms and the maximum number of bedroom is ten, minimum is zero.
+The bedroom boxplot demonstrated that majority of the properties have two to four bedrooms and the maximum bedroom number is ten, minimum is zero.
 
 ```{r Borough}
 
@@ -264,7 +266,7 @@ boxplot(london$ppsf ~ london$type, horizontal = TRUE, ylab = NULL, xlab = "Price
 
 ```
 
-The boxplot above shown ppsf with different property types.  "Penthouse" and "Apartment" are generally more expensive than "House" and the most expensive property is "Apartment".
+The boxplot above shown ppsf with different property types.  "Penthouse" and "Apartment" are generally more expensive than "House".  "Apartment" has a wide range as it has the most expensive property as well as the least expensive one.
 
 
 ```{r Price of property by number of bedroom}
@@ -274,7 +276,7 @@ boxplot(london$ppsf ~ london$bedroom, horizontal = TRUE, ylab = "No of Bedroom",
 
 ```
 
-The price by number of bedroom boxplot above shown majority of the property prices are not affected by the number of bedroom. It is also noted that highest priced property has five bedrooms.
+The price by number of bedroom boxplot above shown majority of the property prices are not affected by the number of bedroom. It is also noted that the highest priced property has five bedrooms and more bedrooms not neccessarily increase the property price.
 
 ```{r Population}
 
@@ -309,9 +311,9 @@ temp[order(temp$crime_rate),]
 rm(temp)
 ```
 
-The borough which has the lowest crime rate is "`r london$borough[which.min(london$crime_rate)]`" and "`r london$borough[which.max(london$crime_rate)]`" has the highest crime rate.  The crime rates do not seem to correspond with the boroughs which have the highest and lowest property prices. 
+The borough which has the lowest crime rate is "`r london$borough[which.min(london$crime_rate)]`" and "`r london$borough[which.max(london$crime_rate)]`" has the highest crime rate.  The crime rates do not correspond with the boroughs which have the highest and lowest property prices. 
 
-A correlation matrix is produced by using "corrplot" package to provide a preliminary analysis of the correlation coefficients between different variables.
+After inspected the variables in the "london" data-set, a correlation matrix is produced by using "corrplot" package to provide a preliminary analysis of the correlation coefficients between the different variables.
 
 ```{r Correlation Matrix}
 
@@ -329,20 +331,20 @@ According to the correlation matrix of "London" data-set, ppsf is positively aff
 
 # 4 Model Analysis
 
-In order to test whether demographic data affects the price of the properties and hence the accuracy of the prediction, the models are divided into two sets: one without the demographic data and another with the demographic data.
+In order to test whether demographic data affects the property price and hence the accuracy of the prediction, the models are divided into two sets: one without the demographic data and another with the demographic data.
 
-The following algorithms are used in the machine learning models:
+The models are built with the following machine learning algorithms:
 
 A. Linear Regression
 B. Decision Tree
 C. Random Forrest
 
-RMSE scores are computed for the models in the two sets of algorithms and they are compared and analysed to deduce the findings for this project. 
+RMSE scores are computed for the two sets of models and they are compared and analysed to deduce the findings for this project. 
 
 
 ## 4.1 Data Preparation
 
-In order to verify the models, "London" data-set is split into "test_set" and "train set".  "train_set" is used in the machine learning algorithms and "test_set" is used to verify the models and compute the RMSE scores.  "test_set" is 10% of "london" data-set while "train_set" is 90%.
+In order to verify the models, "London" data-set is split into "test_set" and "train set".  "train_set" is used in the machine learning algorithms and "test_set" is used to verify the models and compute the RMSE scores.  "test_set" is 10% of "london" data-set while "train_set" contains 90% of the data.
 
 
 ```{r Splitting "london" data-set}
@@ -360,7 +362,7 @@ rm(test_index)
 
 ## 4.2 Baseline Model
 
-After to process to create "train_set" and "test_set" is completed , a baseline Model is produced by calculating the average ppsf of "train_set" and its RMSE score is used as the baseline for the results.
+After completed the process to create "train_set" and "test_set", a baseline Model is produced by calculating the average ppsf of "train_set" and its RMSE score is used as the baseline for the results.
 
 ```{r Baseline model}
 ##################
@@ -371,11 +373,12 @@ mu<-mean(train_set$ppsf)
 rmse0<-RMSE(test_set$ppsf, mu)
 ```
 
-The average ppsf is GMP `r mu` per sq ft and it resulted a RMSE score of `r rmse0`. 
+The average ppsf is GBP `r mu` per sq ft and it resulted a RMSE score of `r rmse0`. 
 
 ## 4.3 Models Without Demographic Data
 
 The first set of models, Model 1A, 1B and 1C, are constructed without using the demographic data.
+
 
 ### 4.3.1 Model 1A Linear Regression Without Demographic Data
 
@@ -389,15 +392,14 @@ Model 1A is constructed using linear regression as the algorithm.
 
 # Linear Regression Computation
 lr <- lm(ppsf ~ type+area+bedroom+bathroom+reception+borough, data = train_set)
-summary(lr)
-plot(lr)
 model1a <- predict(lr, newdata = test_set)
 
 # Compute RMSE for Model 1A
 rmse1a<-RMSE(test_set$ppsf, model1a)
 ```
 
-The RMSE score from Model 1A is `r rmse1a` which is better than the baseline model as expected.
+The RMSE score from Model 1A is `r rmse1a` which performed better than the baseline model as expected.
+
 
 ### 4.3.2 Model 1B Decision Tree Without Demographic Data
 
@@ -412,7 +414,6 @@ Model 1B uses Decision Tree as the machine learning algorithm and included pruni
 
 # Decision Tree Computation
 train_rpart1b <- rpart(ppsf ~ type+area+bedroom+bathroom+reception+borough, data = train_set)
-summary(train_rpart1b)
 
 # Split text display
 split.fun <- function(x, labs, digits, varlen, faclen)
@@ -439,7 +440,7 @@ model1b <- predict(pfit1b, newdata=test_set)
 rmse1b<-RMSE(test_set$ppsf, model1b)
 ```
 
-Model 1B achieved a RMSE score of `r rmse1b` and shown Model 1B is not as accurate as Model 1A.  The resulted decision tree shown "borough" as the most significant variable followed by "area" and "type".  It is also noted that bedroom is also one of the more significant variable before the pruning.
+Model 1B achieved a RMSE score of `r rmse1b` and it shown Model 1B is not as accurate as Model 1A.  The resulted decision tree shown "borough" as the most significant variable followed by "area" and "type".  It is also noted that bedroom is also one of the more significant variable before the pruning.
 
 
 ### 4.3.3 Model 1C Random Forest Without Demographic Data
@@ -481,20 +482,18 @@ Model 2A, similar to Model 1A, uses linear regression as the machine learning al
 
 # Linear Regression Computation
 lr <- lm(ppsf ~ ., data = train_set)
-summary(lr)
-plot(lr)
 model2a <- predict(lr, newdata = test_set)
 
 # Compute RMSE for Model 2A
 rmse2a<-RMSE(test_set$ppsf, model2a)
 ```
 
-The RMSE score from Model 2A is `r rmse2a` which is exactly the same as Model 1A.  It shown Demographic data had no effect in the computation of linear regression model.
+The RMSE score from Model 2A is `r rmse2a`, which is exactly the same as Model 1A.  It shown demographic data made no differece in the computation of linear regression model.
 
 
 ### 4.4.2 Model 2B Decision Tree With Demographic Data
 
-Model 2B uses Decision Tree with pruning as the machine learning algorithm.
+Model 2B uses Decision Tree, with pruning, as the machine learning algorithm.
 
 ```{r Model 2B Decision Tree, results = FALSE}
 
@@ -504,7 +503,6 @@ Model 2B uses Decision Tree with pruning as the machine learning algorithm.
 
 # Decision Tree Computation
 train_rpart2b <- rpart(ppsf ~ ., data = train_set)
-summary(train_rpart2b)
 rpart.plot(train_rpart2b, faclen = 0, type=5, yesno=T, clip.facs = TRUE, under = T, digits=-3, extra=101, cex=0.5, split.fun = split.fun)
 
 # Prune the Tree
@@ -553,14 +551,29 @@ summary
 
 The results are compiled in the summary table above and the key findings are:
 
-- The most accurate prediction is Model 1C Random Forest Without Demographic Data
-- Demographic data made no difference in linear regression model and it is irrelevant in the algorithm
-- Demographic data improved the accuracy in Decision Tree model as shown in Model 2B
-- Although the demographic data shown as important variables in Model 2C Random Forest with Demographic Data however the accuracy is lower than Model 1C Random Forest Model without Demographic Data
-- Borough is the most important variable which confirmed the location factor contributes the most to housing price
-- Despite the size factor is taken away by using ppsf, however the results shown the larger properties also have higher ppsf
++ The most accurate prediction is by Model 1C Random Forest without demographic data
++ Demographic data made no difference in linear regression models, Model 1A and Model 2A
++ Demographic data improved the accuracy in Decision Tree model as shown in Model 2B
++ Although the demographic data is shown as important variables in the random forest model - Model 2C however the Model 1C, random forest without demographic data performed better
++ Borough is the most important variable across the different algorithms which confirmed the location factor contributes the most to housing price
++ Despite the size factor is taken away by using ppsf, the size of property still affect the housing prices as larger properties also have higher ppsf
 
 
 # 6 Conclusion
 
-From the two sets of machine learning models tested, it is clear that Random Forest algorithm out-performed Linear Regression and Decision Tree in housing price prediction.  It is less clearer whether the inclusion of demographic data (population, unemployment rate and crime rate) improves the performance of the algorithms as the results varied and inconclusive.
+From the two sets of machine learning models tested, it is clear that Random Forest algorithm out-performed Linear Regression and Decision Tree in housing price prediction.  It is less clearer whether the inclusion of demographic data (population, unemployment rate and crime rate) improves the performance of the algorithms as the results are varied and inconclusive.
+
+
+## 6.1 Limitation and Future Work
+
+This project is limited by the size of the data-set, number of variables and limited number of machine learning algorithms.  The following further works can be implemented to build from this project and possibly come up with more conclusive results:
+
++ Increase the size of the data-set used by including more transactions in London or even including transactions outside of London.  This will improve the predictive power of the algorithms.
++ Increase the number variables such as number of car space, proximity to education, proximity to amenities etc to study whether these factors can improve the algorithms.
++ Test other demographic variables such as education level, marriage ratio, children population and average number of household etc to study whether other demographic data can affect the prediction.
++ Study other machine learning algorithms, such as XGBoost which is often used in housing price prediction, to improve from random forest  for the prediction
+
+
+# 7. Reference
+
+Rafael A. Irizarry (2019), Introduction to Data Science: Data Analysis and Prediction Algorithms with R

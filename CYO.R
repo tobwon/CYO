@@ -254,8 +254,6 @@ rmse0<-RMSE(test_set$ppsf, mu)
 
 # Linear Regression Computation
 lr <- lm(ppsf ~ type+area+bedroom+bathroom+reception+borough, data = train_set)
-summary(lr)
-plot(lr)
 model1a <- predict(lr, newdata = test_set)
 
 # Compute RMSE for Model 1A
@@ -270,7 +268,6 @@ rmse1a<-RMSE(test_set$ppsf, model1a)
 
 # Decision Tree Computation
 train_rpart1b <- rpart(ppsf ~ type+area+bedroom+bathroom+reception+borough, data = train_set)
-summary(train_rpart1b)
 
 # Split text display
 split.fun <- function(x, labs, digits, varlen, faclen)
@@ -321,8 +318,6 @@ rmse1c<-RMSE(test_set$ppsf, model1c)
 
 # Linear Regression Computation
 lr <- lm(ppsf ~ ., data = train_set)
-summary(lr)
-plot(lr)
 model2a <- predict(lr, newdata = test_set)
 
 # Compute RMSE for Model 2A
@@ -337,7 +332,6 @@ rmse2a<-RMSE(test_set$ppsf, model2a)
 
 # Decision Tree Computation
 train_rpart2b <- rpart(ppsf ~ ., data = train_set)
-summary(train_rpart2b)
 rpart.plot(train_rpart2b, faclen = 0, type=5, yesno=T, clip.facs = TRUE, under = T, digits=-3, extra=101, cex=0.5, split.fun = split.fun)
 
 # Prune the Tree
